@@ -1,0 +1,46 @@
+#!/usr/bin/env node
+const program = require('commander') // eslint-disable-line
+
+program
+  .version('0.1.0')
+  .option('-r, --rebuild', 'Start the containers and rebuild the images')
+  .option('-c, --create', 'Force recreate the containers')
+  .option('-d, --down', 'Stop the containers')
+  .option('-l, --logs', 'Log the output of all containers')
+  .option('-f, --follow', 'Log the output of all containers in watch mode')
+  .option(
+    '--compose <path>',
+    `override docker-compose process name
+  you could have installed docker with snap on ubuntu and ended up with docker.compose instead of docker-compose`,
+    'docker-compose'
+  )
+  .parse(process.argv);
+
+const dockerFileNameParam = '-f docker-compose.dev.yml';
+
+const getArgs = () => {
+  if (program.rebuild) {
+    return [dockerFileNameParam, 'up', '-d', '--build', '--force-recreate', '--remove-orphans'];
+  }
+
+  if (program.create) {
+    return [dockerFileNameParam, 'up', '-d', '--force-recreate'];
+  }
+
+  if (program.down) {
+    return [dockerFileNameParam, 'down', '--volumes', '--remove-orphans'];
+  }
+
+  if (program.logs) {
+    return [dockerFileNameParam, 'logs'];
+  }
+
+  if (program.follow || (program.logs && program.follow)) {
+    return [dockerFileNameParam, 'logs', '-f'];
+  }
+
+  return [dockerFileNameParam, 'up', '-d'];
+};
+
+const opts = { stdio: 'inherit', shell: true };
+require('child_process').spawn(program.compose, getArgs(), opts);
