@@ -4,7 +4,7 @@ Small, simple and opinionated utility to manage your dev docker environment
 ## Requirements
 
 - Node.js
-- commander package in your dev dependencies
+- [`commander`](https://www.npmjs.com/package/commander) package in your dev dependencies
 
 ## How to use it
 
